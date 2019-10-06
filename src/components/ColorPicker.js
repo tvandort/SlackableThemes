@@ -5,7 +5,7 @@ const isHexValue = dirtyValue => hexExpression.test(dirtyValue);
 
 const defaultHex = "000000";
 
-const ColorPicker = () => {
+const useHexState = () => {
   const [dirtyValue, setDirtyValue] = useState(defaultHex);
   const [cleanValue, setCleanValue] = useState(defaultHex);
 
@@ -18,22 +18,23 @@ const ColorPicker = () => {
     }
   };
 
+  return { handleValue: handleDirtyValue, value: dirtyValue, handleBlur };
+};
+
+const ColorPicker = () => {
+  const { handleValue, handleBlur, value } = useHexState();
   return (
     <div>
       <button
         style={{
           width: 20,
           height: 20,
-          backgroundColor: "#" + dirtyValue,
+          backgroundColor: "#" + value,
           display: "inline-block"
         }}
       />
       <span>#</span>
-      <input
-        value={dirtyValue}
-        onChange={handleDirtyValue}
-        onBlur={handleBlur}
-      />
+      <input value={value} onChange={handleValue} onBlur={handleBlur} />
     </div>
   );
 };
