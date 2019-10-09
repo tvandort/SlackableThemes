@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect, useRef } from "react";
 
 const Cursor = ({ top = 0, left = 0 }) => (
   <span
@@ -6,7 +6,7 @@ const Cursor = ({ top = 0, left = 0 }) => (
       width: 16,
       height: 16,
       borderRadius: 16,
-      position: "relative",
+      position: "absolute",
       top,
       left,
       transform: "translate(-50%, -50%)",
@@ -20,41 +20,53 @@ const Cursor = ({ top = 0, left = 0 }) => (
 );
 
 const Saturation = ({ color = "red" }) => {
+  let someRef = useRef();
+  let foo = useLayoutEffect(() => {
+    const rect = someRef.current.getBoundingClientRect();
+    console.log("rect", rect);
+    setPosition({ left: rect.width / 2, top: rect.height / 2 });
+  }, [someRef.current]);
+  console.log(foo);
   const [{ left, top }, setPositionState] = useState({ left: 100, top: 100 });
   const setPosition = ({ left, top }) => {
-    if (left < -8) {
-      left = -8;
-    }
-    if (left > 200) {
-      left = 200;
-    }
-    if (top < -8) {
-      top = -8;
-    }
-    if (top > 200) {
-      top = 200;
-    }
+    console.log(left, top);
+    // if (left < 0) {
+    //   left = 0;
+    // }
+    // if (left > 200) {
+    //   left = 200;
+    // }
+    // if (top < 0) {
+    //   top = 0;
+    // }
+    // if (top > 200) {
+    //   top = 200;
+    // }
     setPositionState({ left, top });
   };
 
   return (
     <div
       style={{
-        width: 200,
-        height: 200,
+        width: 400,
+        height: 400,
         backgroundImage: `linear-gradient(to right, transparent, ${color})`,
         position: "relative"
       }}
       onMouseDown={e => {
-        setPosition({ left: e.clientX, top: e.clientY });
+        const rect = someRef.current.getBoundingClientRect();
+        setPosition({
+          left: e.clientX - rect.left,
+          top: e.clientY - rect.top
+        });
       }}
+      ref={someRef}
     >
       <div
         style={{
           backgroundImage: "linear-gradient(transparent, black)",
           width: "100%",
-          height: "100%",
-          position: "absolute"
+          height: "100%"
         }}
       />
       <Cursor left={left} top={top} />
